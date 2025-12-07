@@ -12,7 +12,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "esnext",
+  "type": "commonjs",
   "devDependencies": {
     "@types/node": "^24.10.1",
     "@types/nodemailer": "^7.0.4",
