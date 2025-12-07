@@ -29,12 +29,12 @@ export class UsersService {
     return new User(entity.id, entity.name, entity.email, entity.role, entity.isVerified);
   }
 
-
-  async validatePassword(user: User, plain: string): Promise<boolean> {
-    if (!user.password) {
+  async validatePasswordByEmail(email: string, plain: string): Promise<boolean> {
+    const hash = await this.repo.findPasswordByEmail(email);
+    if (!hash) {
       throw new BadRequestException('User has no password');
     }
-    const isValid = await this.passwordService.verify(user.password, plain);
+    const isValid = await this.passwordService.verify(hash, plain);
     if (!isValid) {
       throw new UnauthorizedException('Invalid credentials');
     }

@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-export PGPASSWORD="$POSTGRES_PASSWORD"
+export PGPASSWORD="$DB_PASS"
 
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
-    CREATE DATABASE "$POSTGRES_DB";
+psql -v ON_ERROR_STOP=1 --username "$DB_USER" <<-EOSQL
+    CREATE DATABASE "$DB_NAME";
 EOSQL
