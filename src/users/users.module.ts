@@ -1,9 +1,21 @@
+// src/users/users.module.ts
 import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
+import { UsersController, AuthController } from './controllers/users.controller';
+import { UsersService } from './application/users.service';
+import { UsersRepository } from './infrastructure/users.repository';
+import { SecurityModule } from '../security/security.module';
+import { EmailModule } from '../email/email.module'; 
 
 @Module({
-  providers: [UsersService],
-  controllers: [UsersController],
+  imports: [SecurityModule, EmailModule],
+  controllers: [UsersController, AuthController],
+  providers: [
+    UsersService,
+    {
+      provide: 'IUsersRepository',
+      useClass: UsersRepository,
+    },
+  ],
+  exports: [UsersService],
 })
 export class UsersModule {}

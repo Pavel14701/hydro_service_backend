@@ -1,8 +1,8 @@
 import { Entity, PrimaryColumn, Column, BeforeInsert } from 'typeorm';
 import { uuidv7 } from 'uuidv7';
 
-@Entity()
-export class User {
+@Entity('users')
+export class UserEntity {
   @PrimaryColumn('uuid')
   id!: string;
 
@@ -12,8 +12,18 @@ export class User {
   @Column({ unique: true })
   email!: string;
 
+  @Column()
+  password!: string;
+
+  @Column({ default: 'user' })
+  role!: string;
+
+  @Column({ default: false })
+  isVerified!: boolean;
+
   @BeforeInsert()
   generateId() {
     this.id = uuidv7();
   }
+
 }
