@@ -1,9 +1,9 @@
 // data-source.ts
 import { DataSource } from 'typeorm';
-import { UserEntity } from './src/users/infrastructure/user.entity';
-import { VerificationToken } from './src/email/infrastructure/email_verification.entity';
+import { UserEntity } from './users/infrastructure/user.entity';
+import { VerificationToken } from './email/infrastructure/email_verification.entity';
 
-export default new DataSource({
+export const AppDataSource = new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT ?? '5432', 10),

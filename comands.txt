@@ -1,0 +1,7 @@
+migrations 
+    create
+        npx typeorm migration:generate src/migrations/InitSchema -d dist/data-source.js
+    run
+        npx ts-node ./node_modules/typeorm/cli.js migration:run -d ./src/data-source.ts
+    revert
+        npx ts-node ./node_modules/typeorm/cli.js migration:revert -d ./src/data-source.ts
