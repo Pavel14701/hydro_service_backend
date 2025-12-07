@@ -1,7 +1,12 @@
+// src/app.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { UsersModule } from './users/users.module';
-import { User } from './users/user.entity';
+import { EmailModule } from './email/email.module';
+import { SecurityModule } from './security/security.module';
+
+import { UserEntity } from './users/infrastructure/user.entity';
 
 @Module({
   imports: [
@@ -12,10 +17,12 @@ import { User } from './users/user.entity';
       username: process.env.DB_USER || 'postgres',
       password: process.env.DB_PASS || 'postgres',
       database: process.env.DB_NAME || 'mydb',
-      entities: [User],
+      entities: [UserEntity],
       synchronize: false, // ⚠️ лучше миграции
     }),
-    UsersModule,
+    UsersModule,     // 👈 модуль пользователей
+    EmailModule,     // 👈 модуль email
+    SecurityModule,  // 👈 модуль защиты
   ],
 })
 export class AppModule {}

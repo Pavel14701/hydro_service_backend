@@ -1,13 +1,15 @@
+// data-source.ts
 import { DataSource } from 'typeorm';
-import { User } from './src/users/user.entity';
+import { UserEntity } from './src/users/infrastructure/user.entity';
+import { VerificationToken } from './src/email/infrastructure/email_verification.entity';
 
 export default new DataSource({
   type: 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432', 10),
-  username: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASS || 'postgres',
-  database: process.env.DB_NAME || 'mydb',
-  entities: [User],
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT ?? '5432', 10),
+  username: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  entities: [UserEntity, VerificationToken],
   migrations: ['src/migrations/*.ts'],
 });
