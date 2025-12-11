@@ -1,5 +1,13 @@
-import { Entity, PrimaryColumn, Column, BeforeInsert } from 'typeorm';
+import { 
+  Entity, 
+  PrimaryColumn, 
+  Column, 
+  BeforeInsert, 
+  OneToMany 
+} from 'typeorm';
 import { uuidv7 } from 'uuidv7';
+import { CartEntity } from '../../cart/infrastructure/entities';
+import { PurchaseEntity } from '../../purchases/infrastructure/entities';
 
 @Entity('users')
 export class UserEntity {
@@ -21,9 +29,14 @@ export class UserEntity {
   @Column({ default: false })
   isVerified!: boolean;
 
+  @OneToMany(() => CartEntity, cart => cart.user)
+  cart!: CartEntity[];
+
+  @OneToMany(() => PurchaseEntity, purchase => purchase.user)
+  purchases!: PurchaseEntity[];
+
   @BeforeInsert()
   generateId() {
     this.id = uuidv7();
   }
-
 }
