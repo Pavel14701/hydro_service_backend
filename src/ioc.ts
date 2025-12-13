@@ -30,7 +30,7 @@ import { DiscountRepository } from './infrastructure/repositories/discount';
             username: config.get('DB_USER', 'postgres'),
             password: config.get('DB_PASS', 'postgres'),
             database: config.get('DB_NAME', 'mydb'),
-            entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+            entities: [__dirname + '/../**/*{.entity.ts,.entity.js,entities.ts}'], 
             synchronize: false,
             };
         },

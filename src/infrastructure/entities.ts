@@ -13,8 +13,12 @@ import { uuidv7 } from 'uuidv7';
 
 
 const decimalTransformer = {
-  to: (value: number): number => value,
-  from: (value: string): number => parseFloat(value),
+  to: (value?: number | null): number | null => {
+    return value ?? null;
+  },
+  from: (value?: string | null): number | null => {
+    return value == null ? null : parseFloat(value);
+  },
 };
 
 
@@ -59,8 +63,9 @@ export class ServiceEntity {
     precision: 10,
     scale: 2,
     transformer: decimalTransformer,
+    nullable: true,
   })
-  price?: number;
+  price?: number | null;
   @Column({ type: 'text', array: true })
   mediaLinks?: string[];
   @ManyToOne(() => CategoryEntity, { nullable: false })
@@ -147,19 +152,14 @@ export class UserEntity {
 export class VerificationTokenEntity {
   @PrimaryColumn('uuid')
   id!: string;
-
   @Column()
   token!: string;
-
   @ManyToOne(() => UserEntity)
   user!: UserEntity;
-
   @CreateDateColumn()
   createdAt!: Date;
-
   @Column({ default: false })
   used!: boolean;
-
   @BeforeInsert()
   generateId() {
       this.id = uuidv7();
