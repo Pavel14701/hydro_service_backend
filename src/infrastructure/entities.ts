@@ -38,6 +38,8 @@ export class SubcategoryEntity {
   name!: string;
   @ManyToOne(() => CategoryEntity, { nullable: false })
   category!: CategoryEntity;
+  @Column({ type: 'uuid' })
+  categoryId!: string;
   @BeforeInsert()
   generateId() {
     this.id = uuidv7();

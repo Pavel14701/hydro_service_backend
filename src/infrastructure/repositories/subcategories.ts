@@ -3,7 +3,6 @@ import { ISubcategoriesRepository } from '../../application/interfaces';
 import { SubcategoryEntity } from '../entities';
 import { IDataSource } from '../../application/interfaces';
 
-
 @Injectable()
 export class SubcategoriesRepository implements ISubcategoriesRepository {
   constructor(@Inject('IDataSource') private readonly dataSource: IDataSource) {}
@@ -11,19 +10,19 @@ export class SubcategoriesRepository implements ISubcategoriesRepository {
   async findPaginated(
     page: number,
     limit: number,
-    sortBy: string = 'name',
+    sortBy: keyof SubcategoryEntity = 'name',
     sortOrder: 'ASC' | 'DESC' = 'ASC',
-    ): Promise<SubcategoryEntity[]> {
+  ): Promise<SubcategoryEntity[]> {
     const offset = (page - 1) * limit;
-    const allowedColumns = ['id', 'name', 'categoryId'];
-    const allowedOrders = ['ASC', 'DESC'];
+    const allowedColumns: (keyof SubcategoryEntity)[] = ['id', 'name', 'categoryId'];
+    const allowedOrders: ('ASC' | 'DESC')[] = ['ASC', 'DESC'];
     const safeColumn = allowedColumns.includes(sortBy) ? sortBy : 'name';
     const safeOrder = allowedOrders.includes(sortOrder) ? sortOrder : 'ASC';
     return await this.dataSource.query<SubcategoryEntity>(
-        `SELECT * FROM "subcategories"
-        ORDER BY ${safeColumn} ${safeOrder}
-        LIMIT $1 OFFSET $2`,
-        [limit, offset],
+      `SELECT * FROM "subcategories"
+       ORDER BY ${safeColumn} ${safeOrder}
+       LIMIT $1 OFFSET $2`,
+      [limit, offset],
     );
   }
 
@@ -38,7 +37,7 @@ export class SubcategoriesRepository implements ISubcategoriesRepository {
   async insert(subcategory: SubcategoryEntity): Promise<SubcategoryEntity> {
     const result = await this.dataSource.query<SubcategoryEntity>(
       'INSERT INTO "subcategories"(id, name, "categoryId") VALUES ($1, $2, $3) RETURNING *',
-      [subcategory.id, subcategory.name, subcategory.category.id],
+      [subcategory.id, subcategory.name, subcategory.categoryId],
     );
     return result[0];
   }
@@ -46,7 +45,7 @@ export class SubcategoriesRepository implements ISubcategoriesRepository {
   async update(subcategory: SubcategoryEntity): Promise<SubcategoryEntity> {
     const result = await this.dataSource.query<SubcategoryEntity>(
       'UPDATE "subcategories" SET name = $2, "categoryId" = $3 WHERE id = $1 RETURNING *',
-      [subcategory.id, subcategory.name, subcategory.category.id],
+      [subcategory.id, subcategory.name, subcategory.categoryId],
     );
     return result[0];
   }
