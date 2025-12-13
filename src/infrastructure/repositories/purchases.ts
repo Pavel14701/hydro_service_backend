@@ -13,12 +13,17 @@ export class PurchaseRepository {
     sortOrder: 'ASC' | 'DESC' = 'DESC',
   ): Promise<PurchaseEntity[]> {
     const offset = (page - 1) * limit;
+    const allowedColumns: (keyof PurchaseEntity)[] = ['id', 'purchasedAt', 'amount'];
+    const allowedOrders: ('ASC' | 'DESC')[] = ['ASC', 'DESC'];
+    const safeColumn = allowedColumns.includes(sortBy) ? sortBy : 'purchasedAt';
+    const safeOrder = allowedOrders.includes(sortOrder) ? sortOrder : 'DESC';
+
     return await this.dataSource.query<PurchaseEntity>(
-          `SELECT * FROM "purchases"
-           ORDER BY ${String(sortBy)} ${sortOrder}
-           LIMIT $1 OFFSET $2`,
-          [limit, offset],
-        );
+      `SELECT * FROM "purchases"
+       ORDER BY ${safeColumn} ${safeOrder}
+       LIMIT $1 OFFSET $2`,
+      [limit, offset],
+    );
   }
 
   async findById(id: string): Promise<PurchaseEntity | null> {
@@ -32,11 +37,11 @@ export class PurchaseRepository {
   async findByUser(userId: string, page: number, limit: number): Promise<PurchaseEntity[]> {
     const offset = (page - 1) * limit;
     return await this.dataSource.query<PurchaseEntity>(
-          `SELECT * FROM "purchases" WHERE "userId" = $1
-           ORDER BY "purchasedAt" DESC, "id" DESC
-           LIMIT $2 OFFSET $3`,
-          [userId, limit, offset],
-        );
+      `SELECT * FROM "purchases" WHERE "userId" = $1
+       ORDER BY "purchasedAt" DESC, "id" DESC
+       LIMIT $2 OFFSET $3`,
+      [userId, limit, offset],
+    );
   }
 
   async count(): Promise<number> {
@@ -56,15 +61,21 @@ export class PurchaseRepository {
 
   async insert(purchase: PurchaseEntity): Promise<PurchaseEntity> {
     const result = await this.dataSource.query<PurchaseEntity>(
-      `INSERT INTO "purchases"(id, "userId", "serviceId", "purchasedAt")
-       VALUES ($1, $2, $3, COALESCE($4, NOW()))
+      `INSERT INTO "purchases"(id,"userId","serviceId","discountId",amount,"purchasedAt")
+       VALUES ($1,$2,$3,$4,$5,COALESCE($6,NOW()))
        RETURNING *`,
-      [purchase.id, (purchase as any).user.id, (purchase as any).service.id, purchase.purchasedAt],
+      [
+        purchase.id,
+        (purchase as any).user.id,
+        (purchase as any).service.id,
+        purchase.discount ? (purchase as any).discount.id : null,
+        purchase.amount,
+        purchase.purchasedAt,
+      ],
     );
     return result[0];
   }
 
-  // История покупок не должна меняться. Если потребуется метаданные — создаём отдельное поле.
   async update(): Promise<never> {
     throw new BadRequestException('Purchase history is immutable and cannot be updated');
   }

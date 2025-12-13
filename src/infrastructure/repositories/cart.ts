@@ -95,10 +95,7 @@ export class CartRepository {
       if (cartItems.length === 0) {
         return [];
       }
-
       const purchases: PurchaseEntity[] = [];
-
-      // 2. Переносим каждую услугу в покупки
       for (const item of cartItems) {
         const result = await manager.query(
           `INSERT INTO "purchases"(id, "userId", "serviceId", "purchasedAt")
@@ -108,13 +105,10 @@ export class CartRepository {
         );
         purchases.push(result[0] as PurchaseEntity);
       }
-
-      // 3. Чистим корзину
       await manager.query(
         `DELETE FROM "cart" WHERE "userId" = $1`,
         [userId],
       );
-
       return purchases;
     });
   }

@@ -70,6 +70,10 @@ export class PurchaseEntity {
   user!: UserEntity;
   @ManyToOne(() => ServiceEntity, { nullable: false })
   service!: ServiceEntity;
+  @ManyToOne(() => DiscountEntity, { nullable: true })
+  discount?: DiscountEntity;
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  amount!: number;
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   purchasedAt!: Date;
   @BeforeInsert()
@@ -77,6 +81,7 @@ export class PurchaseEntity {
     this.id = uuidv7();
   }
 }
+
 
 
 
@@ -141,4 +146,35 @@ export class VerificationTokenEntity {
   generateId() {
       this.id = uuidv7();
     }
+}
+
+
+@Entity('discounts')
+export class DiscountEntity {
+  @PrimaryColumn('uuid')
+  id!: string;
+  @Column({ type: 'varchar', length: 50 })
+  code!: string;
+  @Column({ type: 'enum', enum: ['PERCENT', 'FIXED'] })
+  type!: 'PERCENT' | 'FIXED';
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  value!: number;
+  @Column({ type: 'enum', enum: ['SERVICE', 'CART', 'USER'] })
+  scope!: 'SERVICE' | 'CART' | 'USER';
+  @ManyToOne(() => ServiceEntity, { nullable: true })
+  service?: ServiceEntity;
+  @ManyToOne(() => UserEntity, { nullable: true })
+  user?: UserEntity;
+  @Column({ type: 'timestamp', nullable: true })
+  validFrom?: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  validUntil?: Date;
+  @Column({ type: 'boolean', default: false })
+  firstPurchaseOnly!: boolean;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt!: Date;
+  @BeforeInsert()
+  generateId() {
+    this.id = uuidv7();
+  }
 }

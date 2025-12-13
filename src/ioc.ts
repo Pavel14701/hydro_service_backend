@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { TypeOrmDataSource } from './infrastructure/adapters/db';
-import { UsersRepository } from './infrastructure/repositories/users.';
+import { UsersRepository } from './infrastructure/repositories/users';
 import { AuthController, EmailVerificationController, UsersController } from './controllers/user';
 import { UsersService } from './application/services/user';
 import { EmailVerificationService } from './application/services/email-verification';
@@ -100,9 +100,7 @@ export class ServiceModule {}
 
 
 @Module({
-    imports: [
-
-    ],
+    imports: [DatabaseModule],
     providers: [
 
     ],
@@ -112,9 +110,7 @@ export class CategoryModule {}
 
 
 @Module({
-    imports: [
-
-    ],
+    imports: [DatabaseModule],
     providers: [
 
     ],
@@ -124,9 +120,7 @@ export class SubcategoryModule {}
 
 
 @Module({
-    imports: [
-
-    ],
+    imports: [DatabaseModule],
     providers: [
 
     ],
