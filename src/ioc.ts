@@ -10,6 +10,7 @@ import { EmailVerificationService } from './application/services/email-verificat
 import { EmailVerificationRepository } from './infrastructure/repositories/email-verification';
 import { MailService } from './infrastructure/adapters/mail';
 import { PasswordAdapter } from './infrastructure/adapters/password';
+import { DiscountRepository } from './infrastructure/repositories/discount';
 
 
 @Module({
@@ -89,6 +90,17 @@ export class SecurityModule {}
 })
 export class UsersModule {}
 
+
+@Module({
+  imports: [DatabaseModule],
+  providers: [
+    {
+      provide: 'IDiscountRepository',
+      useClass: DiscountRepository
+    }
+  ]
+})
+export class DiscountModule {}
 
 @Module({
     imports: [DatabaseModule],

@@ -13,6 +13,8 @@ async function bootstrap() {
   app.enableCors({
     origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:4200'],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   const redisClient = new Redis({
@@ -26,19 +28,26 @@ async function bootstrap() {
     prefix: 'sess:',
   });
 
-  app.use(
-    session({
-      store,
-      secret: process.env.SESSION_SECRET || 'supersecret',
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        maxAge: 1000 * 60 * 60, // 1 час
-        secure: false,
-      },
-    }),
-  );
+app.use(
+  session({
+    store,
+    secret: process.env.SESSION_SECRET!,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 1000 * 60 * 60,
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    },
+  }),
+);
 
   await app.listen(3000);
 }
 bootstrap();
+
+
+if (!process.env.SESSION_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('SESSION_SECRET must be set in production');
+}

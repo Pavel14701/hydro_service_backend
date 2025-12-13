@@ -1,9 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DiscountEntity } from '../entities';
-import { IDataSource } from '../../application/interfaces';
+import { IDataSource, IDiscountRepository } from '../../application/interfaces';
 
 @Injectable()
-export class DiscountRepository {
+export class DiscountRepository implements IDiscountRepository {
   constructor(@Inject('IDataSource') private readonly dataSource: IDataSource) {}
 
   async findById(id: string): Promise<DiscountEntity | null> {

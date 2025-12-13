@@ -2,7 +2,8 @@ import {
   ServiceEntity,
   SubcategoryEntity,
   CategoryEntity,
-  UserEntity
+  UserEntity,
+  DiscountEntity
 } from '../infrastructure/entities';
 
 export interface IEmailVerificationRepository {
@@ -82,4 +83,11 @@ export interface IDataSource {
   lockRow(table: string, id: string | number, mode?: 'FOR UPDATE' | 'FOR SHARE'): Promise<void>;
   acquireAdvisoryLock(key: number): Promise<void>;
   releaseAdvisoryLock(key: number): Promise<void>;
+}
+
+export interface IDiscountRepository {
+  findById(id: string): Promise<DiscountEntity | null>;
+  findByCode(code: string): Promise<DiscountEntity | null>;
+  findAll(page: number, limit: number): Promise<DiscountEntity[]>;
+  insert(discount: DiscountEntity): Promise<DiscountEntity>;
 }

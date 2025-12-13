@@ -12,6 +12,12 @@ import {
 import { uuidv7 } from 'uuidv7';
 
 
+const decimalTransformer = {
+  to: (value: number): number => value,
+  from: (value: string): number => parseFloat(value),
+};
+
+
 @Entity('categories')
 export class CategoryEntity {
   @PrimaryColumn('uuid')
@@ -46,7 +52,12 @@ export class ServiceEntity {
   title!: string;
   @Column({ type: 'text' })
   description!: string;
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    transformer: decimalTransformer,
+  })
   price?: number;
   @Column({ type: 'text', array: true })
   mediaLinks?: string[];
@@ -72,7 +83,12 @@ export class PurchaseEntity {
   service!: ServiceEntity;
   @ManyToOne(() => DiscountEntity, { nullable: true })
   discount?: DiscountEntity;
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    transformer: decimalTransformer,
+  })
   amount!: number;
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   purchasedAt!: Date;
@@ -157,7 +173,12 @@ export class DiscountEntity {
   code!: string;
   @Column({ type: 'enum', enum: ['PERCENT', 'FIXED'] })
   type!: 'PERCENT' | 'FIXED';
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    transformer: decimalTransformer,
+  })
   value!: number;
   @Column({ type: 'enum', enum: ['SERVICE', 'CART', 'USER'] })
   scope!: 'SERVICE' | 'CART' | 'USER';

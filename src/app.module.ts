@@ -1,7 +1,7 @@
 // src/app.module.ts
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { DatabaseModule, EmailModule, SecurityModule, UsersModule } from './ioc';
+import { DatabaseModule, DiscountModule, EmailModule, SecurityModule, UsersModule } from './ioc';
 
 @Module({
   imports: [
@@ -12,6 +12,7 @@ import { DatabaseModule, EmailModule, SecurityModule, UsersModule } from './ioc'
     UsersModule,
     EmailModule,
     SecurityModule,
+    DiscountModule,
   ],
 })
 export class AppModule {}
