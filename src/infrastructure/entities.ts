@@ -1,0 +1,144 @@
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  ManyToOne,
+  BeforeInsert,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  CreateDateColumn,
+} from 'typeorm';
+import { uuidv7 } from 'uuidv7';
+
+
+@Entity('categories')
+export class CategoryEntity {
+  @PrimaryColumn('uuid')
+  id!: string;
+  @Column({ type: 'varchar', length: 100 })
+  name!: string;
+  @BeforeInsert()
+  generateId() {
+    this.id = uuidv7();
+  }
+}
+
+@Entity('subcategories')
+export class SubcategoryEntity {
+  @PrimaryColumn('uuid')
+  id!: string;
+  @Column({ type: 'varchar', length: 100 })
+  name!: string;
+  @ManyToOne(() => CategoryEntity, { nullable: false })
+  category!: CategoryEntity;
+  @BeforeInsert()
+  generateId() {
+    this.id = uuidv7();
+  }
+}
+
+@Entity('services')
+export class ServiceEntity {
+  @PrimaryColumn('uuid')
+  id!: string;
+  @Column({ type: 'varchar', length: 255 })
+  title!: string;
+  @Column({ type: 'text' })
+  description!: string;
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  price?: number;
+  @Column({ type: 'text', array: true })
+  mediaLinks?: string[];
+  @ManyToOne(() => CategoryEntity, { nullable: false })
+  category!: CategoryEntity;
+  @ManyToMany(() => SubcategoryEntity)
+  @JoinTable()
+  subcategories!: SubcategoryEntity[];
+
+  @BeforeInsert()
+  generateId() {
+    this.id = uuidv7();
+  }
+}
+
+@Entity('purchases')
+export class PurchaseEntity {
+  @PrimaryColumn('uuid')
+  id!: string;
+  @ManyToOne(() => UserEntity, user => user.purchases, { nullable: false })
+  user!: UserEntity;
+  @ManyToOne(() => ServiceEntity, { nullable: false })
+  service!: ServiceEntity;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  purchasedAt!: Date;
+  @BeforeInsert()
+  generateId() {
+    this.id = uuidv7();
+  }
+}
+
+
+
+@Entity('cart')
+export class CartEntity {
+  @PrimaryColumn('uuid')
+  id!: string;
+  @ManyToOne(() => UserEntity, user => user.cart, { nullable: false })
+  user!: UserEntity;
+  @ManyToOne(() => ServiceEntity, { nullable: false })
+  service!: ServiceEntity;
+  @BeforeInsert()
+  generateId() {
+    this.id = uuidv7();
+  }
+}
+
+
+@Entity('users')
+export class UserEntity {
+  @PrimaryColumn('uuid')
+  id!: string;
+  @Column()
+  name!: string;
+  @Column({ unique: true })
+  email!: string;
+  @Column()
+  password!: string;
+  @Column({ default: 'user' })
+  role!: string;
+  @Column({ default: false })
+  isVerified!: boolean;
+  @OneToMany(() => CartEntity, cart => cart.user)
+  cart!: CartEntity[];
+  @OneToMany(() => PurchaseEntity, purchase => purchase.user)
+  purchases!: PurchaseEntity[];
+  @BeforeInsert()
+  generateId() {
+    this.id = uuidv7();
+  }
+}
+
+
+@Entity('verification_tokens')
+export class VerificationTokenEntity {
+  @PrimaryColumn('uuid')
+  id!: string;
+
+  @Column()
+  token!: string;
+
+  @ManyToOne(() => UserEntity)
+  user!: UserEntity;
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @Column({ default: false })
+  used!: boolean;
+
+  @BeforeInsert()
+  generateId() {
+      this.id = uuidv7();
+    }
+}
