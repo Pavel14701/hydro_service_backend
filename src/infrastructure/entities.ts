@@ -23,7 +23,7 @@ export class CategoryEntity {
   @PrimaryColumn('uuid')
   id!: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100, unique: true })
   name!: string;
 
   @OneToMany(() => SubcategoryEntity, sub => sub.category)
