@@ -14,13 +14,17 @@ export class SubcategoriesRepository implements ISubcategoriesRepository {
     sortOrder: 'ASC' | 'DESC' = 'ASC',
   ): Promise<SubcategoryEntity[]> {
     const offset = (page - 1) * limit;
-    const safeColumn = ['id', 'name', 'categoryId'].includes(sortBy) ? sortBy : 'name';
+    const columnMap: Partial<Record<keyof SubcategoryEntity, string>> = {
+      id: 'id',
+      name: 'name',
+      categoryId: '"categoryId"',
+    };
+    const safeColumn = columnMap[sortBy] ?? 'name';
     const safeOrder = sortOrder === 'DESC' ? 'DESC' : 'ASC';
-
     return await this.dataSource.query<SubcategoryEntity>(
       `SELECT * FROM "subcategories"
-       ORDER BY ${safeColumn} ${safeOrder}
-       LIMIT $1 OFFSET $2`,
+      ORDER BY ${safeColumn} ${safeOrder}
+      LIMIT $1 OFFSET $2`,
       [limit, offset],
     );
   }
