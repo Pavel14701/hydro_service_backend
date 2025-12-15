@@ -31,7 +31,7 @@ export class GetSubcategoriesQuery {
   limit: number = 20;
 
   @IsOptional()
-  @IsEnum(['id', 'name', 'categoryId']) // допустимые поля сортировки
+  @IsEnum(['id', 'name', 'categoryId'])
   sortBy: 'id' | 'name' | 'categoryId' = 'name';
 
   @IsIn(['ASC', 'DESC'])
