@@ -2,7 +2,7 @@ import { Injectable, Inject, BadRequestException, UnauthorizedException } from '
 import { uuidv7 } from 'uuidv7';
 import { IPasswordAdapter, IUsersRepository } from '../interfaces';
 import { EmailVerificationService } from './email-verification';
-import { User } from '../../domen/models';
+import { UserDM } from '../../domain/models';
 
 
 @Injectable()
@@ -13,19 +13,19 @@ export class UsersService {
     private readonly mailService: EmailVerificationService,
   ) {}
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserDM[]> {
     const entities = await this.repo.findAll();
     return entities.map(
-      e => new User(e.id, e.name, e.email, e.role, e.isVerified),
+      e => new UserDM(e.id, e.name, e.email, e.role, e.isVerified),
     );
   }
 
-  async create(name: string, email: string, password: string): Promise<User> {
+  async create(name: string, email: string, password: string): Promise<UserDM> {
     const id = uuidv7();
     const hashedPassword = await this.passwordService.hash(password);
     const entity = await this.repo.insert(id, name, email, hashedPassword);
     await this.mailService.sendVerificationEmail(entity)
-    return new User(entity.id, entity.name, entity.email, entity.role, entity.isVerified);
+    return new UserDM(entity.id, entity.name, entity.email, entity.role, entity.isVerified);
   }
 
   async validatePasswordByEmail(email: string, plain: string): Promise<boolean> {
