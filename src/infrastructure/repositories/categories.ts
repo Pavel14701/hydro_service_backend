@@ -3,34 +3,53 @@ import { ICategoriesRepository } from '../../application/interfaces';
 import { CategoryEntity } from '../entities';
 import { IDataSource } from '../../application/interfaces';
 
-
 @Injectable()
 export class CategoriesRepository implements ICategoriesRepository {
   constructor(@Inject('IDataSource') private readonly dataSource: IDataSource) {}
 
-    async findPaginated(
+  async findPaginated(
     page: number,
     limit: number,
-    sortBy: string = 'name',
+    sortBy: keyof CategoryEntity = 'name',
     sortOrder: 'ASC' | 'DESC' = 'ASC',
-    ): Promise<CategoryEntity[]> {
+  ): Promise<CategoryEntity[]> {
     const offset = (page - 1) * limit;
-    const allowedColumns = ['id', 'name', 'createdAt'];
-    const allowedOrders = ['ASC', 'DESC'];
-    const safeColumn = allowedColumns.includes(sortBy) ? sortBy : 'name';
-    const safeOrder = allowedOrders.includes(sortOrder) ? sortOrder : 'ASC';
+    const safeColumn = ['id', 'name'].includes(sortBy) ? sortBy : 'name';
+    const safeOrder = sortOrder === 'DESC' ? 'DESC' : 'ASC';
+
     return await this.dataSource.query<CategoryEntity>(
-        `SELECT * FROM "categories"
-        ORDER BY ${safeColumn} ${safeOrder}
-        LIMIT $1 OFFSET $2`,
-        [limit, offset],
+      `SELECT * FROM "categories"
+       ORDER BY ${safeColumn} ${safeOrder}
+       LIMIT $1 OFFSET $2`,
+      [limit, offset],
     );
-    }
+  }
+
+  async findAll(): Promise<CategoryEntity[]> {
+    return await this.dataSource.query<CategoryEntity>(
+      'SELECT * FROM "categories" ORDER BY name ASC',
+    );
+  }
 
   async findById(id: string): Promise<CategoryEntity | null> {
     const result = await this.dataSource.query<CategoryEntity>(
       'SELECT * FROM "categories" WHERE id = $1',
       [id],
+    );
+    return result.length > 0 ? result[0] : null;
+  }
+
+  async findByIds(ids: string[]): Promise<CategoryEntity[]> {
+    return await this.dataSource.query<CategoryEntity>(
+      'SELECT * FROM "categories" WHERE id = ANY($1)',
+      [ids],
+    );
+  }
+
+  async findByName(name: string): Promise<CategoryEntity | null> {
+    const result = await this.dataSource.query<CategoryEntity>(
+      'SELECT * FROM "categories" WHERE LOWER(name) = LOWER($1) LIMIT 1',
+      [name],
     );
     return result.length > 0 ? result[0] : null;
   }
@@ -62,4 +81,3 @@ export class CategoriesRepository implements ICategoriesRepository {
     return result[0].total;
   }
 }
-
