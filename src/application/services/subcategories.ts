@@ -31,7 +31,7 @@ export class SubcategoriesService {
     const category = await this.categoriesRepository.findById(categoryId);
     if (!category) throw new BadRequestException(`Category with id ${categoryId} does not exist`);
 
-    const existing = await this.findByNameAndCategory(name, categoryId);
+    const existing = await this.subcategoriesRepository.findByNameAndCategory(name, categoryId);
     if (existing) throw new BadRequestException(`Subcategory "${name}" already exists in this category`);
 
     const entity = new SubcategoryEntity();
@@ -47,6 +47,11 @@ export class SubcategoriesService {
 
     const category = await this.categoriesRepository.findById(categoryId);
     if (!category) throw new BadRequestException(`Category with id ${categoryId} does not exist`);
+
+    const duplicate = await this.subcategoriesRepository.findByNameAndCategory(name, categoryId);
+    if (duplicate && duplicate.id !== id) {
+      throw new BadRequestException(`Subcategory "${name}" already exists in this category`);
+    }
 
     entity.name = name;
     entity.categoryId = categoryId;
@@ -64,21 +69,21 @@ export class SubcategoriesService {
     return this.subcategoriesRepository.count();
   }
 
-  async findByNameAndCategory(name: string, categoryId: string): Promise<SubcategoryDM | null> {
-    const entities = await this.subcategoriesRepository.findPaginated(1, 50, 'name', 'ASC');
-    const found = entities.find(s => s.name.toLowerCase() === name.toLowerCase() && s.categoryId === categoryId);
-    return found ? Mapper.toDomain(found, SubcategoryDM) : null;
-  }
-
   async getSubcategoriesWithCategoryName(): Promise<{ subcategory: SubcategoryDM; categoryName: string }[]> {
-    const entities = await this.subcategoriesRepository.findPaginated(1, 100, 'name', 'ASC');
-    const result: { subcategory: SubcategoryDM; categoryName: string }[] = [];
+    const entities = await this.subcategoriesRepository.findAll();
+    if (!entities.length) return [];
 
-    for (const e of entities) {
-      const category = await this.categoriesRepository.findById(e.categoryId);
-      result.push({ subcategory: Mapper.toDomain(e, SubcategoryDM), categoryName: category?.name ?? 'Unknown' });
+    const categoryIds = Array.from(new Set(entities.map(e => e.categoryId)));
+    const categories = await this.categoriesRepository.findByIds(categoryIds);
+
+    const categoriesById = new Map<string, string>();
+    for (const category of categories) {
+      categoriesById.set(category.id, category.name);
     }
 
-    return result;
+    return entities.map(e => ({
+      subcategory: Mapper.toDomain(e, SubcategoryDM),
+      categoryName: categoriesById.get(e.categoryId) ?? 'Unknown',
+    }));
   }
 }

@@ -11,6 +11,7 @@ export class CategoriesService {
     private readonly subcategoriesRepository: ISubcategoriesRepository,
   ) {}
 
+  // Пагинация + сортировка
   async getCategories(
     page: number,
     limit: number,
@@ -21,12 +22,14 @@ export class CategoriesService {
     return Mapper.toDomainList(entities, CategoryDM);
   }
 
+  // Получение категории по id
   async getCategoryById(id: string): Promise<CategoryDM> {
     const entity = await this.categoriesRepository.findById(id);
     if (!entity) throw new NotFoundException(`Category with id ${id} not found`);
     return Mapper.toDomain(entity, CategoryDM);
   }
 
+  // Создание категории
   async createCategory(name: string): Promise<CategoryDM> {
     const existing = await this.findByName(name);
     if (existing) throw new BadRequestException(`Category "${name}" already exists`);
@@ -37,6 +40,7 @@ export class CategoriesService {
     return Mapper.toDomain(inserted, CategoryDM);
   }
 
+  // Обновление категории
   async updateCategory(id: string, name: string): Promise<CategoryDM> {
     const entity = await this.categoriesRepository.findById(id);
     if (!entity) throw new NotFoundException(`Category with id ${id} not found`);
@@ -51,49 +55,47 @@ export class CategoriesService {
     return Mapper.toDomain(updated, CategoryDM);
   }
 
+  // Удаление категории с каскадным удалением подкатегорий
   async deleteCategory(id: string): Promise<void> {
     const entity = await this.categoriesRepository.findById(id);
     if (!entity) throw new NotFoundException(`Category with id ${id} not found`);
 
-    const subs = await this.subcategoriesRepository.findPaginated(1, 100, 'name', 'ASC');
-    const relatedSubs = subs.filter(s => s.categoryId === entity.id);
-    for (const sub of relatedSubs) {
-      await this.subcategoriesRepository.delete(sub.id);
-    }
-
+    await this.subcategoriesRepository.deleteByCategoryId(entity.id);
     await this.categoriesRepository.delete(entity.id);
   }
 
+  // Подсчёт категорий
   async countCategories(): Promise<number> {
     return this.categoriesRepository.count();
   }
 
+  // Поиск по имени
   async findByName(name: string): Promise<CategoryDM | null> {
-    const entities = await this.categoriesRepository.findPaginated(1, 100, 'name', 'ASC');
-    const found = entities.find(c => c.name.toLowerCase() === name.toLowerCase());
-    return found ? Mapper.toDomain(found, CategoryDM) : null;
+    const entity = await this.categoriesRepository.findByName(name);
+    return entity ? Mapper.toDomain(entity, CategoryDM) : null;
   }
 
+  // Категории с количеством подкатегорий
   async getCategoriesWithSubcategoryCount(): Promise<{ category: CategoryDM; subcategoryCount: number }[]> {
-    const entities = await this.categoriesRepository.findPaginated(1, 100, 'name', 'ASC');
+    const entities = await this.categoriesRepository.findAll();
     const result: { category: CategoryDM; subcategoryCount: number }[] = [];
 
     for (const e of entities) {
-      const subs = await this.subcategoriesRepository.findPaginated(1, 100, 'name', 'ASC');
-      const count = subs.filter(s => s.categoryId === e.id).length;
+      const count = await this.subcategoriesRepository.countByCategoryId(e.id);
       result.push({ category: Mapper.toDomain(e, CategoryDM), subcategoryCount: count });
     }
 
     return result;
   }
 
+  // Категории без подкатегорий
   async getEmptyCategories(): Promise<CategoryDM[]> {
-    const entities = await this.categoriesRepository.findPaginated(1, 100, 'name', 'ASC');
+    const entities = await this.categoriesRepository.findAll();
     const result: CategoryDM[] = [];
 
     for (const e of entities) {
-      const subs = await this.subcategoriesRepository.findPaginated(1, 100, 'name', 'ASC');
-      if (subs.filter(s => s.categoryId === e.id).length === 0) {
+      const count = await this.subcategoriesRepository.countByCategoryId(e.id);
+      if (count === 0) {
         result.push(Mapper.toDomain(e, CategoryDM));
       }
     }

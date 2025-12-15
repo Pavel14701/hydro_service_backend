@@ -14,10 +14,9 @@ export class SubcategoriesRepository implements ISubcategoriesRepository {
     sortOrder: 'ASC' | 'DESC' = 'ASC',
   ): Promise<SubcategoryEntity[]> {
     const offset = (page - 1) * limit;
-    const allowedColumns: (keyof SubcategoryEntity)[] = ['id', 'name', 'categoryId'];
-    const allowedOrders: ('ASC' | 'DESC')[] = ['ASC', 'DESC'];
-    const safeColumn = allowedColumns.includes(sortBy) ? sortBy : 'name';
-    const safeOrder = allowedOrders.includes(sortOrder) ? sortOrder : 'ASC';
+    const safeColumn = ['id', 'name', 'categoryId'].includes(sortBy) ? sortBy : 'name';
+    const safeOrder = sortOrder === 'DESC' ? 'DESC' : 'ASC';
+
     return await this.dataSource.query<SubcategoryEntity>(
       `SELECT * FROM "subcategories"
        ORDER BY ${safeColumn} ${safeOrder}
@@ -26,10 +25,24 @@ export class SubcategoriesRepository implements ISubcategoriesRepository {
     );
   }
 
+  async findAll(): Promise<SubcategoryEntity[]> {
+    return await this.dataSource.query<SubcategoryEntity>(
+      'SELECT * FROM "subcategories" ORDER BY name ASC',
+    );
+  }
+
   async findById(id: string): Promise<SubcategoryEntity | null> {
     const result = await this.dataSource.query<SubcategoryEntity>(
       'SELECT * FROM "subcategories" WHERE id = $1',
       [id],
+    );
+    return result.length > 0 ? result[0] : null;
+  }
+
+  async findByNameAndCategory(name: string, categoryId: string): Promise<SubcategoryEntity | null> {
+    const result = await this.dataSource.query<SubcategoryEntity>(
+      'SELECT * FROM "subcategories" WHERE LOWER(name) = LOWER($1) AND "categoryId" = $2 LIMIT 1',
+      [name, categoryId],
     );
     return result.length > 0 ? result[0] : null;
   }
@@ -54,9 +67,21 @@ export class SubcategoriesRepository implements ISubcategoriesRepository {
     await this.dataSource.query('DELETE FROM "subcategories" WHERE id = $1', [id]);
   }
 
+  async deleteByCategoryId(categoryId: string): Promise<void> {
+    await this.dataSource.query('DELETE FROM "subcategories" WHERE "categoryId" = $1', [categoryId]);
+  }
+
   async count(): Promise<number> {
     const result = await this.dataSource.query<{ total: number }>(
       'SELECT COUNT(*)::int AS total FROM "subcategories"',
+    );
+    return result[0].total;
+  }
+
+  async countByCategoryId(categoryId: string): Promise<number> {
+    const result = await this.dataSource.query<{ total: number }>(
+      'SELECT COUNT(*)::int AS total FROM "subcategories" WHERE "categoryId" = $1',
+      [categoryId],
     );
     return result[0].total;
   }

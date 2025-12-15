@@ -5,10 +5,8 @@ export class Mapper {
   ): TDomain {
     const domainInstance: any = new DomainClass();
 
-    for (const key of Object.keys(domainInstance)) {
-      if (Object.prototype.hasOwnProperty.call(entity, key)) {
-        domainInstance[key] = (entity as any)[key];
-      }
+    for (const key of Object.keys(entity as any)) {
+      domainInstance[key] = (entity as any)[key];
     }
 
     return domainInstance as TDomain;

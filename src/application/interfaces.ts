@@ -36,33 +36,43 @@ export interface IServicesRepository {
   count(): Promise<number>; 
 }
 
+
 export interface ISubcategoriesRepository {
   findPaginated(
     page: number,
     limit: number,
     sortBy?: keyof SubcategoryEntity,
-    sortOrder?: 'ASC' | 'DESC'
+    sortOrder?: 'ASC' | 'DESC',
   ): Promise<SubcategoryEntity[]>;
+  findAll(): Promise<SubcategoryEntity[]>;
   findById(id: string): Promise<SubcategoryEntity | null>;
+  findByNameAndCategory(name: string, categoryId: string): Promise<SubcategoryEntity | null>;
   insert(subcategory: SubcategoryEntity): Promise<SubcategoryEntity>;
   update(subcategory: SubcategoryEntity): Promise<SubcategoryEntity>;
   delete(id: string): Promise<void>;
+  deleteByCategoryId(categoryId: string): Promise<void>;
   count(): Promise<number>;
+  countByCategoryId(categoryId: string): Promise<number>;
 }
+
 
 export interface ICategoriesRepository {
   findPaginated(
     page: number,
     limit: number,
     sortBy?: keyof CategoryEntity,
-    sortOrder?: 'ASC' | 'DESC'
+    sortOrder?: 'ASC' | 'DESC',
   ): Promise<CategoryEntity[]>;
+  findAll(): Promise<CategoryEntity[]>;
   findById(id: string): Promise<CategoryEntity | null>;
+  findByIds(ids: string[]): Promise<CategoryEntity[]>;
+  findByName(name: string): Promise<CategoryEntity | null>;
   insert(category: CategoryEntity): Promise<CategoryEntity>;
   update(category: CategoryEntity): Promise<CategoryEntity>;
   delete(id: string): Promise<void>;
   count(): Promise<number>;
 }
+
 
 export interface IUsersRepository {
   findAll(): Promise<UserEntity[]>;
@@ -73,13 +83,10 @@ export interface IUsersRepository {
 
 export interface IDataSource {
   query<T = any>(sql: string, params?: any[]): Promise<T[]>;
-
   beginTransaction(): Promise<void>;
   commitTransaction(): Promise<void>;
   rollbackTransaction(): Promise<void>;
-
   transaction<T>(cb: (manager: { query: (sql: string, params?: any[]) => Promise<any[]> }) => Promise<T>): Promise<T>;
-
   lockRow(table: string, id: string | number, mode?: 'FOR UPDATE' | 'FOR SHARE'): Promise<void>;
   acquireAdvisoryLock(key: number): Promise<void>;
   releaseAdvisoryLock(key: number): Promise<void>;
