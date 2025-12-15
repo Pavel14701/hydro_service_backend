@@ -1,4 +1,4 @@
-import { IsString, IsUUID, IsOptional, IsInt, Min, IsIn } from 'class-validator';
+import { IsString, IsUUID, IsOptional, IsInt, Min, IsIn, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateSubcategoryRequest {
@@ -30,9 +30,9 @@ export class GetSubcategoriesQuery {
   @IsOptional()
   limit: number = 20;
 
-  @IsString()
   @IsOptional()
-  sortBy: string = 'name';
+  @IsEnum(['id', 'name', 'categoryId']) // допустимые поля сортировки
+  sortBy: 'id' | 'name' | 'categoryId' = 'name';
 
   @IsIn(['ASC', 'DESC'])
   @IsOptional()
