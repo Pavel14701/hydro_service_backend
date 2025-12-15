@@ -1,7 +1,7 @@
-// src/app.module.ts
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule, DiscountModule, EmailModule, SecurityModule, UsersModule } from './ioc';
+import { CsrfMiddleware } from './csrf.middleware';
 
 @Module({
   imports: [
@@ -15,4 +15,8 @@ import { DatabaseModule, DiscountModule, EmailModule, SecurityModule, UsersModul
     DiscountModule,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CsrfMiddleware).forRoutes('*');
+  }
+}
