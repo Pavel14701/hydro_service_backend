@@ -1,4 +1,11 @@
-import { UserDM, CategoryDM, SubcategoryDM } from "../domain/models";
+import { 
+  UserDM, 
+  CategoryDM, 
+  SubcategoryDM, 
+  DiscountDM, 
+  PurchaseDM, 
+  CartDM
+} from "../domain/models";
 
 export class UserDto {
   id: string;
@@ -81,4 +88,70 @@ export class SubcategoryWithCategoryNameDto {
       domain.categoryName,
     );
   }
+}
+
+
+export class DiscountDto {
+  id!: string;
+  code!: string;
+  type!: 'PERCENT' | 'FIXED';
+  value!: number;
+  scope!: 'SERVICE' | 'CART' | 'USER';
+  serviceId?: string;
+  userId?: string;
+  validFrom?: Date;
+  validUntil?: Date;
+  firstPurchaseOnly!: boolean;
+  createdAt!: Date;
+
+  static fromDomain(dm: DiscountDM): DiscountDto {
+    const dto = new DiscountDto();
+    dto.id = dm.id;
+    dto.code = dm.code;
+    dto.type = dm.type;
+    dto.value = dm.value;
+    dto.scope = dm.scope;
+    dto.serviceId = dm.serviceId;
+    dto.userId = dm.userId;
+    dto.validFrom = dm.validFrom;
+    dto.validUntil = dm.validUntil;
+    dto.firstPurchaseOnly = dm.firstPurchaseOnly;
+    dto.createdAt = dm.createdAt!;
+    return dto;
+  }
+}
+
+
+export class PurchaseDto {
+  id!: string;
+  userId!: string;
+  serviceId!: string;
+  discountId?: string;
+  amount!: number;
+  purchasedAt!: Date;
+
+  static fromDomain(dm: PurchaseDM): PurchaseDto {
+    const dto = new PurchaseDto();
+    dto.id = dm.id;
+    dto.userId = dm.userId;
+    dto.serviceId = dm.serviceId;
+    dto.discountId = dm.discountId;
+    dto.amount = dm.amount ?? 0;
+    dto.purchasedAt = dm.purchasedAt ?? new Date();
+    return dto;
+  }
+}
+
+export class CartDto { 
+  id!: string; 
+  userId!: string; 
+  serviceId!: string; 
+
+  static fromDomain(dm: CartDM): CartDto { 
+    const dto = new CartDto(); 
+    dto.id = dm.id; 
+    dto.userId = dm.userId; 
+    dto.serviceId = dm.serviceId; 
+    return dto; 
+  } 
 }

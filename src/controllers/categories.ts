@@ -7,10 +7,12 @@ import {
   Param,
   Body,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { CategoriesService } from '../application/services/categories';
+import { AuthGuard } from '../infrastructure/adapters/guard';
+import { CategoriesService } from '../application/services/category';
 import { CategoryWithCountDto, CategoryDto } from '../application/dto';
-import { CreateCategoryRequest, UpdateCategoryRequest, GetCategoriesQuery } from './schemas/categories';
+import { CreateCategoryRequest, UpdateCategoryRequest, GetCategoriesQuery } from './schemas/category';
 
 @Controller('categories')
 export class CategoriesController {
@@ -28,24 +30,28 @@ export class CategoriesController {
   }
 
   @Get(':id')
+  @UseGuards(new AuthGuard('admin'))
   async getCategoryById(@Param('id') id: string): Promise<CategoryDto> {
     const category = await this.categoriesService.getCategoryById(id);
     return CategoryDto.fromDomain(category);
   }
 
   @Post()
+  @UseGuards(new AuthGuard('admin'))
   async createCategory(@Body() body: CreateCategoryRequest): Promise<CategoryDto> {
     const category = await this.categoriesService.createCategory(body.name);
     return CategoryDto.fromDomain(category);
   }
 
   @Put(':id')
+  @UseGuards(new AuthGuard('admin'))
   async updateCategory(@Param('id') id: string, @Body() body: UpdateCategoryRequest): Promise<CategoryDto> {
     const category = await this.categoriesService.updateCategory(id, body.name);
     return CategoryDto.fromDomain(category);
   }
 
   @Delete(':id')
+  @UseGuards(new AuthGuard('admin'))
   async deleteCategory(@Param('id') id: string): Promise<void> {
     await this.categoriesService.deleteCategory(id);
   }
@@ -62,6 +68,7 @@ export class CategoriesController {
   }
 
   @Get('meta/empty')
+  @UseGuards(new AuthGuard('admin'))
   async getEmptyCategories(): Promise<CategoryDto[]> {
     const categories = await this.categoriesService.getEmptyCategories();
     return categories.map(CategoryDto.fromDomain);

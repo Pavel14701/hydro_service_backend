@@ -39,4 +39,20 @@ export class UsersService {
     }
     return true;
   }
+
+
+async login(email: string, plain: string): Promise<UserDM> { 
+  const entity = await this.repo.findByEmail(email); 
+  if (!entity) { throw new UnauthorizedException('User not found'); 
+  } const isValid = await this.validatePasswordByEmail(email, plain); 
+    if (!isValid) { throw new UnauthorizedException('Invalid credentials'); 
+  } 
+  return new UserDM(
+    entity.id, 
+    entity.name, 
+    entity.email, 
+    entity.role, 
+    entity.isVerified); 
+  } 
 }
+

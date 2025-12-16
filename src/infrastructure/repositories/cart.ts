@@ -1,9 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { CartEntity, PurchaseEntity } from '../entities';
-import { IDataSource } from '../../application/interfaces';
+import { ICartRepository, IDataSource } from '../../application/interfaces';
 
 @Injectable()
-export class CartRepository {
+export class CartRepository implements ICartRepository {
   constructor(@Inject('IDataSource') private readonly dataSource: IDataSource) {}
 
   async findPaginated(

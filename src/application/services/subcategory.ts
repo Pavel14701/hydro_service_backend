@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { SubcategoryEntity } from '../../infrastructure/entities';
-import { ISubcategoriesRepository, ICategoriesRepository } from '../../application/interfaces';
+import { ISubcategoriesRepository, ICategoriesRepository } from '../interfaces';
 import { SubcategoryDM } from '../../domain/models';
 import { Mapper } from '../../domain/mapper';
 
