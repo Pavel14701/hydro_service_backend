@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { EmailVerificationService } from '../application/services/email-verification';
 import { UsersService } from '../application/services/user';
 import { UserDto } from '../application/dto';
@@ -26,14 +26,22 @@ export class AuthController {
     @Req() req: Request,
   ) {
     const user = await this.usersService.login(body.email, body.password);
-    req.session.user = {
-      id: user.id,
-      name: user.name,
-      role: user.role,
-    };
-
-    return { message: 'Logged in successfully', user: req.session.user };
+    return new Promise((resolve, reject) => {
+      req.session.regenerate((err) => {
+        if (err) {
+          reject(new UnauthorizedException('Session regeneration failed'));
+          return;
+        }
+        req.session.user = {
+          id: user.id,
+          name: user.name,
+          role: user.role,
+        };
+        resolve({ message: 'Logged in successfully', user: req.session.user });
+      });
+    });
   }
+
 
   @Post('logout')
   async logout(@Req() req: Request) {
