@@ -7,7 +7,11 @@
     "start": "ts-node src/main.ts",
     "start:dev": "nest start --watch",
     "build": "tsc",
-    "start:prod": "node dist/main.js"
+    "start:prod": "node dist/main.js",
+    "typeorm": "ts-node ./node_modules/typeorm/cli.js",
+    "migration:generate": "node scripts/migrate.js",
+    "migration:upgrade": "npm run typeorm -- migration:run -d src/data-source.ts", 
+    "migration:downgrade": "npm run typeorm -- migration:revert -d src/data-source.ts"
   },
   "keywords": [],
   "author": "",

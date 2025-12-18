@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { EmailVerificationService } from '../application/services/email-verification';
 import { UsersService } from '../application/services/user';
 import { UserDto } from '../application/dto';
 import { CreateUserSchema, LoginUserSchema } from './schemas/user';
+import { Request } from 'express';
+import { AuthGuard } from '../infrastructure/adapters/guard';
 
 @Controller('auth')
 export class EmailVerificationController {
@@ -17,12 +19,36 @@ export class EmailVerificationController {
 @Controller('auth')
 export class AuthController {
   constructor(private readonly usersService: UsersService) {}
+
   @Post('login')
-  async login(@Body() body: LoginUserSchema): Promise<{ success: boolean }> {
-    const { email, password } = body;
-    const isValid = await this.usersService.validatePasswordByEmail(email, password);
-    return { success: isValid };
+  async login(
+    @Body() body: LoginUserSchema,
+    @Req() req: Request,
+  ) {
+    const user = await this.usersService.login(body.email, body.password);
+    return new Promise((resolve, reject) => {
+      req.session.regenerate((err) => {
+        if (err) {
+          reject(new UnauthorizedException('Session regeneration failed'));
+          return;
+        }
+        req.session.user = {
+          id: user.id,
+          name: user.name,
+          role: user.role,
+        };
+        resolve({ message: 'Logged in successfully', user: req.session.user });
+      });
+    });
   }
+
+
+  @Post('logout')
+  async logout(@Req() req: Request) {
+    req.session.destroy(() => {});
+    return { message: 'Logged out successfully' };
+  }
+
 }
 
 @Controller('users')
@@ -30,6 +56,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @UseGuards(new AuthGuard('admin'))
   async getUsers(): Promise<UserDto[]> {
     const users = await this.usersService.findAll();
     return users.map(UserDto.fromDomain);

@@ -1,9 +1,9 @@
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
-import { PurchaseEntity } from '../entities';
-import { IDataSource } from '../../application/interfaces';
+import { PurchaseEntity } from '../entities/purchase';
+import { IDataSource, IPurchaseRepository } from '../../application/interfaces';
 
 @Injectable()
-export class PurchaseRepository {
+export class PurchaseRepository implements IPurchaseRepository {
   constructor(@Inject('IDataSource') private readonly dataSource: IDataSource) {}
 
   async findPaginated(

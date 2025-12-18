@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IDataSource, IUsersRepository } from '../../application/interfaces';
-import { UserEntity } from '../entities';
+import { UserEntity } from '../entities/user';
 
 @Injectable()
 export class UsersRepository implements IUsersRepository {
@@ -32,4 +32,10 @@ export class UsersRepository implements IUsersRepository {
     }
     return result[0].password;
   }
+
+  async findByEmail(email: string): Promise<UserEntity | null> {
+     const result = await this.dataSource.query<UserEntity>(
+       'SELECT * FROM "users" WHERE email = $1 LIMIT 1', [email], 
+     ); 
+     return result.length > 0 ? result[0] : null; }
 }

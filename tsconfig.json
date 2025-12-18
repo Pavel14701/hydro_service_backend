@@ -10,5 +10,5 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "exclude": ["data-source.ts"]
+  "typeRoots": ["./src/types", "./node_modules/@types"]
 }

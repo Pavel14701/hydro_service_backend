@@ -1,10 +1,10 @@
-import { 
-  ServiceEntity,
-  SubcategoryEntity,
-  CategoryEntity,
-  UserEntity,
-  DiscountEntity
-} from '../infrastructure/entities';
+import { CartEntity } from "../infrastructure/entities/cart";
+import { CategoryEntity } from "../infrastructure/entities/category";
+import { DiscountEntity } from "../infrastructure/entities/discount";
+import { PurchaseEntity } from "../infrastructure/entities/purchase";
+import { ServiceEntity } from "../infrastructure/entities/service";
+import { SubcategoryEntity } from "../infrastructure/entities/subcategory";
+import { UserEntity } from "../infrastructure/entities/user";
 
 export interface IEmailVerificationRepository {
   saveToken(token: string, userId: string): Promise<void>;
@@ -78,6 +78,7 @@ export interface IUsersRepository {
   findAll(): Promise<UserEntity[]>;
   insert(id: string, name: string, email: string, hashedPassword: string): Promise<UserEntity>;
   findPasswordByEmail(email: string): Promise<string | null>;
+  findByEmail(email: string): Promise<UserEntity | null>;
 }
 
 
@@ -97,4 +98,39 @@ export interface IDiscountRepository {
   findByCode(code: string): Promise<DiscountEntity | null>;
   findAll(page: number, limit: number): Promise<DiscountEntity[]>;
   insert(discount: DiscountEntity): Promise<DiscountEntity>;
+  delete(id: string): Promise<void>;
+  count(): Promise<number>;
+}
+
+
+export interface IPurchaseRepository{
+  findPaginated(
+      page: number,
+      limit: number,
+      sortBy: keyof PurchaseEntity,
+      sortOrder: 'ASC' | 'DESC',
+  ): Promise<PurchaseEntity[]>; 
+  findById(id: string): Promise<PurchaseEntity | null>;
+  findByUser(userId: string, page: number, limit: number): Promise<PurchaseEntity[]>;
+  count(): Promise<number>;
+  countByUser(userId: string): Promise<number>;
+  insert(purchase: PurchaseEntity): Promise<PurchaseEntity>;
+}
+
+
+export interface ICartRepository{
+  findPaginated(
+      page: number,
+      limit: number,
+      sortBy: keyof CartEntity,
+      sortOrder: 'ASC' | 'DESC',
+    ): Promise<CartEntity[]>;
+  findById(id: string): Promise<CartEntity | null>;
+  findByUser(userId: string, page: number, limit: number): Promise<CartEntity[]>;
+  count(): Promise<number>;
+  countByUser(userId: string): Promise<number>;
+  insert(cart: CartEntity): Promise<CartEntity>;
+  delete(id: string): Promise<void>;
+  deleteByUserAndService(userId: string, serviceId: string): Promise<void>;
+  checkout(userId: string): Promise<PurchaseEntity[]>;
 }

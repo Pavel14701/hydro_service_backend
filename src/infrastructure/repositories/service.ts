@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IServicesRepository } from '../../application/interfaces';
-import { ServiceEntity } from '../entities';
+import { ServiceEntity } from '../entities/service';
 import { IDataSource } from '../../application/interfaces';
 
 @Injectable()

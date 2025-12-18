@@ -7,8 +7,9 @@ import {
   Param,
   Body,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { SubcategoriesService } from '../application/services/subcategories';
+import { SubcategoriesService } from '../application/services/subcategory';
 import {
   SubcategoryDto,
   SubcategoryWithCategoryNameDto,
@@ -17,7 +18,8 @@ import {
   CreateSubcategoryRequest,
   UpdateSubcategoryRequest,
   GetSubcategoriesQuery,
-} from './schemas/subcategories';
+} from './schemas/subcategory';
+import { AuthGuard } from '../infrastructure/adapters/guard';
 
 
 @Controller('subcategories')
@@ -36,24 +38,28 @@ export class SubcategoriesController {
   }
 
   @Get(':id')
+  @UseGuards(new AuthGuard('admin'))
   async getSubcategoryById(@Param('id') id: string): Promise<SubcategoryDto> {
     const sub = await this.subcategoriesService.getSubcategoryById(id);
     return SubcategoryDto.fromDomain(sub);
   }
 
   @Post()
+  @UseGuards(new AuthGuard('admin'))
   async createSubcategory(@Body() body: CreateSubcategoryRequest): Promise<SubcategoryDto> {
     const sub = await this.subcategoriesService.createSubcategory(body.name, body.categoryId);
     return SubcategoryDto.fromDomain(sub);
   }
 
   @Put(':id')
+  @UseGuards(new AuthGuard('admin'))
   async updateSubcategory(@Param('id') id: string, @Body() body: UpdateSubcategoryRequest): Promise<SubcategoryDto> {
     const sub = await this.subcategoriesService.updateSubcategory(id, body.name, body.categoryId);
     return SubcategoryDto.fromDomain(sub);
   }
 
   @Delete(':id')
+  @UseGuards(new AuthGuard('admin'))
   async deleteSubcategory(@Param('id') id: string): Promise<void> {
     await this.subcategoriesService.deleteSubcategory(id);
   }

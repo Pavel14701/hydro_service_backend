@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { ISubcategoriesRepository } from '../../application/interfaces';
-import { SubcategoryEntity } from '../entities';
+import { SubcategoryEntity } from '../entities/subcategory';
 import { IDataSource } from '../../application/interfaces';
 
 @Injectable()
