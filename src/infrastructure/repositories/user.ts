@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IDataSource, IUsersRepository } from '../../application/interfaces';
-import { UserEntity } from '../entities';
+import { UserEntity } from '../entities/user';
 
 @Injectable()
 export class UsersRepository implements IUsersRepository {

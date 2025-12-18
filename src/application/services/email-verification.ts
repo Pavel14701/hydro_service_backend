@@ -2,8 +2,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { uuidv7 } from 'uuidv7';
-import { UserEntity } from '../../infrastructure/entities';
 import { IEmailVerificationRepository, IMailService } from '../interfaces';
+import { UserEntity } from '../../infrastructure/entities/user';
 
 @Injectable()
 export class EmailVerificationService {

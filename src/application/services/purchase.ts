@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PurchaseDM } from '../../domain/models';
 import { Mapper } from '../../domain/mapper';
-import { PurchaseEntity } from '../../infrastructure/entities';
 import { uuidv7 } from 'uuidv7';
 import { IPurchaseRepository } from '../interfaces';
+import { PurchaseEntity } from '../../infrastructure/entities/purchase';
 
 @Injectable()
 export class PurchaseService {

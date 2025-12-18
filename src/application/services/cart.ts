@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CartDM, PurchaseDM } from '../../domain/models';
 import { Mapper } from '../../domain/mapper';
-import { CartEntity } from '../../infrastructure/entities';
 import { uuidv7 } from 'uuidv7';
 import { ICartRepository } from '../interfaces';
+import { CartEntity } from '../../infrastructure/entities/cart';
 
 @Injectable()
 export class CartService {

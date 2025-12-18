@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
-import { PurchaseEntity } from '../entities';
+import { PurchaseEntity } from '../entities/purchase';
 import { IDataSource, IPurchaseRepository } from '../../application/interfaces';
 
 @Injectable()

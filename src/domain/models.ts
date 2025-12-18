@@ -1,12 +1,10 @@
-import { 
-  CartEntity, 
-  CategoryEntity, 
-  DiscountEntity, 
-  PurchaseEntity, 
-  ServiceEntity, 
-  SubcategoryEntity, 
-  UserEntity 
-} from "../infrastructure/entities";
+import { CartEntity } from "../infrastructure/entities/cart";
+import { CategoryEntity } from "../infrastructure/entities/category";
+import { DiscountEntity } from "../infrastructure/entities/discount";
+import { PurchaseEntity } from "../infrastructure/entities/purchase";
+import { ServiceEntity } from "../infrastructure/entities/service";
+import { SubcategoryEntity } from "../infrastructure/entities/subcategory";
+import { UserEntity } from "../infrastructure/entities/user";
 
 export class UserDM {
   constructor(

@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { DiscountEntity } from '../entities';
+import { DiscountEntity } from '../entities/discount';
 import { IDataSource, IDiscountRepository } from '../../application/interfaces';
 
 @Injectable()

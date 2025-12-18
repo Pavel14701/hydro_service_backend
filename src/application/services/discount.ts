@@ -1,9 +1,9 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { IDiscountRepository } from '../interfaces';
-import { DiscountEntity } from '../../infrastructure/entities';
 import { DiscountDM } from '../../domain/models';
 import { Mapper } from '../../domain/mapper';
 import { uuidv7 } from 'uuidv7';
+import { DiscountEntity } from '../../infrastructure/entities/discount';
 
 @Injectable()
 export class DiscountService {

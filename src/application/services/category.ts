@@ -1,8 +1,8 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { CategoryEntity } from '../../infrastructure/entities';
 import { ICategoriesRepository, ISubcategoriesRepository } from '../interfaces';
 import { CategoryDM } from '../../domain/models';
 import { Mapper } from '../../domain/mapper';
+import { CategoryEntity } from '../../infrastructure/entities/category';
 
 @Injectable()
 export class CategoriesService {
